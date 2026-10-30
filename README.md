@@ -1,0 +1,40 @@
+YAML
+
+name: Gerar APK Acidente Zero
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar arquivos
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Preparar Android
+        uses: android-actions/setup-android@v3
+
+      - name: Instalar Cordova
+        run: npm install -g cordova
+
+      - name: Criar projeto
+        run: |
+          cordova create app br.com.acidentezero AcidenteZero
+          cp *.html app/www/index.html
+          cd app
+          cordova platform add android
+          cordova build android
+
+      - name: Salvar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Acidente-Zero-APK
+          path: app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
